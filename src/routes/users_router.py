@@ -1,12 +1,18 @@
 from fastapi import APIRouter
+from src.controllers.users_controller import UserController
+from src.routes.schemas import (
+        RegisterRequest, RegisterReply)
 
 
 router = APIRouter(prefix="/users")
+controller = UserController()
 
 
 @router.post("/")
-def register():
-    pass
+def register(request: RegisterRequest):
+    reply = controller.register(request)
+    reply = RegisterReply()
+    return reply
 
 
 @router.post("/login")

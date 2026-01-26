@@ -1,4 +1,8 @@
-from pydadntic import BaseModel
+from pydantic import BaseModel
+
+
+class UserBase(BaseModel):
+    username: str
 
 
 class User(BaseModel):
@@ -9,14 +13,19 @@ class User(BaseModel):
     image_url: str = ""
 
 
-class RequestRegister(User):
-    pass
-
-
-class RequestAuthenticate(BaseModel):
-    username: str
+class RegisterRequest(UserBase):
     password: str
 
 
-class RequestUpdateCurrentUser(User):
-    pass
+class RegisterReply(User):
+    username: str
+
+
+class AuthenticationRequest(UserBase):
+    password: str
+
+
+class UpdateCurrentUserRequest(BaseModel):
+    email: str
+    bio: str
+    image_url: str
