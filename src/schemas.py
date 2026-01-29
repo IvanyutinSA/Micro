@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Annotated
 
 
 class UserBase(BaseModel):
@@ -8,16 +9,16 @@ class UserBase(BaseModel):
 class User(BaseModel):
     email: str
     username: str
-    bio: str = ""
-    image_url: str = ""
+    bio: str | None = None
+    image_url: str | None = None
 
 
-class RegisterRequest(UserBase):
+class CreateUserRequest(UserBase):
     email: str
     password: str
 
 
-class RegisterReply(User):
+class CreateUserReply(User):
     pass
 
 
@@ -41,5 +42,5 @@ class UpdateUserRequest(User):
     password: str
 
 
-class UpdateUserResponse(User):
+class UpdateUserReply(User):
     pass

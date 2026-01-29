@@ -12,3 +12,8 @@ Base.metadata.create_all(engine)
 
 def get_engine():
     return engine
+
+
+def recreate_tables():
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)

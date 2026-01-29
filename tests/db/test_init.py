@@ -1,11 +1,15 @@
 from test_utils.test_suit import TestSuit
-from src.models.sqlalchemy_db import get_engine
+from src.models.sqlalchemy_db import get_engine, recreate_tables
 from src.models.sqlalchemy_models import User
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 
-class TestDB(TestSuit):
+class TestDB():
+    def __enter__(self):
+        recreate_tables()
+        return self
+
     def test_one(self):
         engine = get_engine()
         alice = User(username="Alice",

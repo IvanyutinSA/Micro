@@ -1,30 +1,41 @@
 from fastapi import APIRouter
-from src.controllers.users_controller import UserController
-from src.routes.schemas import (
-        RegisterRequest, RegisterReply)
+from src.controllers.users_controller import (
+        register_user,
+        authenticate_user,
+        get_user,
+        update_user,
+)
+
+from src.schemas import (
+        CreateUserRequest,
+        CreateUserReply,
+        AuthenticationRequest,
+        AuthenticationReply,
+        GetUserReply,
+        UpdateUserRequest,
+        UpdateUserReply,
+)
 
 
 router = APIRouter(prefix="/users")
-controller = UserController()
 
 
 @router.post("/")
-def register(request: RegisterRequest):
-    reply = controller.register(request)
-    reply = RegisterReply()
-    return reply
+def register(request: CreateUserRequest) -> CreateUserReply:
+    return register_user(request)
 
 
 @router.post("/login")
-def authenticate():
-    pass
+def authenticate(request: AuthenticationRequest) -> AuthenticationReply:
+    return authenticate_user(request)
 
 
 @router.get("/")
-def get_current_user():
-    pass
+def get_current_user(request) -> GetUserReply:
+    return get_user(request)
 
 
 @router.put("/")
-def update_current_user():
-    pass
+def update_current_user(request: UpdateUserRequest
+                        ) -> UpdateUserReply:
+    return update_user(request)

@@ -9,6 +9,7 @@ class User(Base):
     __tablename__ = "users"
 
     username: Mapped[str] = mapped_column(primary_key=True, unique=True)
+    email: Mapped[str]
     hashed_password: Mapped[str]
     bio: Mapped[str] = mapped_column(nullable=True)
     image_url: Mapped[str] = mapped_column(nullable=True)
