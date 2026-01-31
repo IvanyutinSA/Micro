@@ -30,16 +30,25 @@ class GetUserReply(User):
     pass
 
 
+class GetUserFullReply(User):
+    password: str
+
+
 class AuthenticationRequest(UserBase):
     password: str
 
 
-class AuthenticationReply(UserBase):
-    pass
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
 class UpdateUserRequest(User):
-    password: str
+    password: str | None = None
+
+
+class UpdateCurrentUserRequest(UpdateUserRequest):
+    username: str | None = None
 
 
 class UpdateUserReply(User):

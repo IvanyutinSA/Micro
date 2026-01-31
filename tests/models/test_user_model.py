@@ -4,7 +4,9 @@ from src.models.sqlalchemy_db import recreate_tables
 from src.schemas import (CreateUserRequest,
                          CreateUserReply,
                          GetUserRequest,
-                         GetUserReply)
+                         GetUserReply,
+                         UpdateUserRequest,
+                         UpdateUserReply)
 
 
 class TestUserModel(TestSuit):
@@ -53,5 +55,30 @@ class TestUserModel(TestSuit):
         expected_reply = None
 
         reply = user_model.get(request)
+
+        self.assert_eq(expected_reply, reply)
+
+    def test_update_user(self):
+        user_model = UserModel()
+        username = "Alice_test_update_user"
+        email = "alice@gmail.com"
+        password = "alicesbigsecret"
+        request = CreateUserRequest(username=username,
+                                    email=email,
+                                    password=password)
+        user_model.create(request)
+        new_bio = "Rabbit?"
+        new_email = "reformed_alice@gmail.com"
+        request = UpdateUserRequest(username=username,
+                                    password=password,
+                                    email=new_email,
+                                    bio=new_bio)
+        expected_reply = UpdateUserReply(username=username,
+                                         password=password,
+                                         email=new_email,
+                                         bio=new_bio,
+                                         image_url=None)
+
+        reply = user_model.update(request)
 
         self.assert_eq(expected_reply, reply)

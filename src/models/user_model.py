@@ -7,6 +7,7 @@ from src.schemas import (
         CreateUserReply,
         UpdateUserRequest,
         UpdateUserReply,
+        GetUserFullReply,
         )
 
 from src.models.sqlalchemy_models import User
@@ -30,11 +31,7 @@ class UserModel:
         return reply
 
     def get(self, request: GetUserRequest) -> GetUserReply | None:
-        username = request.username
-        with Session(self.engine) as session:
-            user = session.scalars(select(User)
-                                   .where(User.username == username)
-                                   ).one_or_none()
+        user = self.get_full(request)
         reply = None
         if user is not None:
             reply = GetUserReply(username=user.username,
@@ -43,5 +40,35 @@ class UserModel:
                                  image_url=user.image_url)
         return reply
 
-    def update(self, user: UpdateUserRequest) -> UpdateUserReply:
-        pass
+    def get_full(self, request: GetUserRequest) -> GetUserFullReply | None:
+        username = request.username
+        with Session(self.engine) as session:
+            user = session.scalars(select(User)
+                                   .where(User.username == username)
+                                   ).one_or_none()
+        reply = None
+        if user is not None:
+            reply = GetUserFullReply(username=user.username,
+                                     password=user.hashed_password,
+                                     email=user.email,
+                                     bio=user.bio,
+                                     image_url=user.image_url)
+        return reply
+
+    def update(self, request: UpdateUserRequest) -> UpdateUserReply:
+        with Session(self.engine) as session:
+            user = session.scalars(select(User)
+                                   .where(User.username == request.username)
+                                   ).one()
+
+            user.email = request.email
+            user.bio = request.bio
+            user.image_url = request.image_url
+            user.password = request.password
+            session.commit()
+
+            reply = UpdateUserReply(username=user.username,
+                                    email=user.email,
+                                    bio=user.bio,
+                                    image_url=user.image_url)
+        return reply
