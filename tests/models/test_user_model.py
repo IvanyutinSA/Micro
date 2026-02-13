@@ -1,12 +1,14 @@
 from test_utils.test_suit import TestSuit
 from src.models.user_model import UserModel
 from src.models.sqlalchemy_db import recreate_tables
-from src.schemas import (CreateUserRequest,
-                         CreateUserReply,
-                         GetUserRequest,
-                         GetUserReply,
-                         UpdateUserRequest,
-                         UpdateUserReply)
+from src.schemas import (
+        GetUserRequest,
+        GetUserReply,
+        CreateUserRequest,
+        CreateUserReply,
+        UpdateUserRequest,
+        UpdateUserReply,
+        )
 
 
 class TestUserModel(TestSuit):

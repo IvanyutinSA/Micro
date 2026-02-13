@@ -1,13 +1,16 @@
 from test_utils.test_suit import TestSuit
 from src.models.sqlalchemy_db import recreate_tables
-from src.schemas import (GetUserRequest,
-                         GetUserReply,
-                         CreateUserRequest,
-                         CreateUserReply,
-                         UpdateUserRequest,
-                         UpdateUserReply,
-                         AuthenticationRequest,
-                         AuthenticationReply)
+from src.utilities.jwt import verify_token, decode_token
+from src.schemas import (
+        CreateUserRequest,
+        CreateUserReply,
+        AuthenticationRequest,
+        Token,
+        GetUserRequest,
+        GetUserReply,
+        UpdateUserRequest,
+        UpdateUserReply,
+)
 from src.controllers.users_controller import (register_user,
                                               authenticate_user,
                                               get_user,
@@ -42,11 +45,13 @@ class TestUserModel(TestSuit):
         register_user(request)
         request = AuthenticationRequest(username=username,
                                         password=password)
-        expected_reply = AuthenticationReply(username=username)
+        expected_token_type = "bearer"
 
         reply = authenticate_user(request)
 
-        self.assert_eq(expected_reply, reply)
+        self.assert_eq(reply.token_type, expected_token_type)
+        self.assert_true(verify_token(reply.access_token))
+        self.assert_eq(decode_token(reply.access_token)['sub'], username)
 
     def test_authenticate_wrong_username(self):
         username = "Alice_test_authenticate_wrong_username"

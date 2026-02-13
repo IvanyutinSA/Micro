@@ -22,7 +22,8 @@ def decode_token(token: str) -> str:
     return jwt.decode(token, HASH_SECRET, ALGORITHM)
 
 
-def verify_token(token: str) -> str:
+def verify_token(token: str) -> bool:
     payload = decode_token(token)
     if payload.get("exp", 0) < time():
-        raise Exception("Bad token")
+        raise False
+    return True

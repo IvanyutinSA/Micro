@@ -1,4 +1,7 @@
 from src.utilities.jwt import create_access_token
+from src.exceptions.http import (ConflictError,
+                                 UnauthorizedError,
+                                 NotFoundError)
 from src.schemas import (
         CreateUserRequest,
         CreateUserReply,
@@ -21,7 +24,7 @@ def register_user(request: CreateUserRequest
     # find user
     user = user_model.get(GetUserRequest(username=request.username))
     if user is not None:
-        raise Exception("User already exists")
+        raise ConflictError(detail="User already exists")
     # hash password
     request.password = hash_password(request.password)
     # add to db
@@ -33,9 +36,9 @@ def authenticate_user(request: AuthenticationRequest
                       ) -> Token:
     user = user_model.get_full(GetUserRequest(username=request.username))
     if (user is None):
-        raise Exception("Incorrect username")
+        raise UnauthorizedError("Invalid credentials")
     if (user.password != hash_password(request.password)):
-        raise Exception("Incorrect password")
+        raise UnauthorizedError("Invalid credentials")
     token = create_access_token(request.username)
     reply = Token(access_token=token,
                   token_type="bearer")
@@ -46,7 +49,7 @@ def get_user(request: GetUserRequest) -> GetUserReply:
     # find user
     reply = user_model.get(request)
     if (reply is None):
-        raise Exception("User is not found")
+        raise NotFoundError("User not found")
     # return
     return reply
 
@@ -55,7 +58,7 @@ def update_user(request: UpdateUserRequest) -> UpdateUserReply:
     # find user
     user = user_model.get_full(GetUserRequest(username=request.username))
     if user is None:
-        raise Exception("User is not found")
+        raise NotFoundError("User not found")
 
     if request.password:
         request.password = hash_password(request.password)
