@@ -17,7 +17,7 @@ from src.controllers.users_controller import (register_user,
                                               update_user)
 
 
-class TestUserModel(TestSuit):
+class TestUserController(TestSuit):
     def __enter__(self):
         recreate_tables()
         return self

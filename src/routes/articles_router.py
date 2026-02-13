@@ -1,32 +1,38 @@
-router = APIRouter(prefix="/users")
+from typing import Annotated
+from fastapi import APIRouter, Depends
+
+from src.schemas import Article, CreateArticleRequest, GetUserRequest
+from src.routes.extra import get_current_user_req
+
+
+router = APIRouter(prefix="/articles")
 
 
 @router.post("/")
-def register(request: CreateUserRequest) -> CreateUserReply:
-    return register_user(request)
-
-
-@router.post("/login")
-def authenticate(request: Annotated[OAuth2PasswordRequestForm, Depends()]
-                 ) -> Token:
-    return authenticate_user(request)
+def create_article(request, user: Annotated[GetUserRequest,
+                                            Depends(get_current_user_req)]):
+    pass
 
 
 @router.get("/")
-def get_current_user(request: Annotated[GetUserReply,
-                                        Depends(get_current_user_req)]
-                     ) -> GetUserReply:
-    return get_user(request)
+def get_articles() -> list[Article]:
+    pass
 
 
-@router.put("/")
-def update_current_user(request: UpdateCurrentUserRequest,
-                        get_user_req: Annotated[GetUserReply,
-                                                Depends(get_current_user_req)]
-                        ) -> UpdateUserReply:
-    request = UpdateUserRequest(username=get_user_req.username,
-                                password=request.password,
-                                email=request.email,
-                                image_url=request.image_url,
-                                bio=request.bio)
-    return update_user(request)
+@router.get("/{slug}")
+def get_article_by_slug(slug: str) -> Article:
+    pass
+
+
+@router.put("/{slug}")
+def update_article(slug: str,
+                   request: Article,
+                   user: Annotated[GetUserRequest,
+                                   Depends(get_current_user_req)]
+                   ) -> Article:
+    pass
+
+
+@router.delete("/{slug}")
+def delete_article(slug: str):
+    pass

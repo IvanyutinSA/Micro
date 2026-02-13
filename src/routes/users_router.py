@@ -12,6 +12,7 @@ from src.controllers.users_controller import (
 from src.schemas import (
         CreateUserRequest,
         CreateUserReply,
+        GetUserRequest,
         GetUserReply,
         UpdateCurrentUserRequest,
         UpdateUserRequest,
@@ -35,7 +36,7 @@ def authenticate(request: Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
 @router.get("/")
-def get_current_user(request: Annotated[GetUserReply,
+def get_current_user(request: Annotated[GetUserRequest,
                                         Depends(get_current_user_req)]
                      ) -> GetUserReply:
     return get_user(request)
@@ -43,7 +44,7 @@ def get_current_user(request: Annotated[GetUserReply,
 
 @router.put("/")
 def update_current_user(request: UpdateCurrentUserRequest,
-                        get_user_req: Annotated[GetUserReply,
+                        get_user_req: Annotated[GetUserRequest,
                                                 Depends(get_current_user_req)]
                         ) -> UpdateUserReply:
     request = UpdateUserRequest(username=get_user_req.username,

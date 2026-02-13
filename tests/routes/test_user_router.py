@@ -1,5 +1,5 @@
 from test_utils.test_suit import TestSuit
-from main import create_server
+from src.main import create_server
 import src.routes.users_router
 import src.schemas
 

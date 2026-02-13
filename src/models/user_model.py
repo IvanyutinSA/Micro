@@ -52,7 +52,8 @@ class UserModel:
                                      password=user.hashed_password,
                                      email=user.email,
                                      bio=user.bio,
-                                     image_url=user.image_url)
+                                     image_url=user.image_url,
+                                     id=user.id)
         return reply
 
     def update(self, request: UpdateUserRequest) -> UpdateUserReply:

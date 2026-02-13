@@ -31,6 +31,7 @@ class GetUserReply(User):
 
 
 class GetUserFullReply(User):
+    id: int
     password: str
 
 
@@ -53,3 +54,19 @@ class UpdateCurrentUserRequest(UpdateUserRequest):
 
 class UpdateUserReply(User):
     pass
+
+
+class ArticleBase(BaseModel):
+    pass
+
+
+class Article(ArticleBase):
+    title: str
+    description: str
+    body: str
+    tag_list: list[str]
+
+
+class CreateArticleRequest(Article):
+    slug: str
+    user_id: int
