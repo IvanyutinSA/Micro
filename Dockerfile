@@ -13,12 +13,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # copy everything else
 COPY src ./src
-COPY .env .env
+# COPY .env .env
 
 # prepare to execution
 RUN useradd app
 USER app
 
 # execute
-# CMD [ "env", "PYTHONPATH=$PWD", "python", "test_utils/run.py" ]
 CMD [ "python", "./src/main.py" ]
