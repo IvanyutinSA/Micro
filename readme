@@ -1,0 +1,12 @@
+export PYTHONPATH=$PWD
+
+
+parts:
+    routers
+    controllers
+    models
+    db_use
+    jwt_controll_system
+    docer
+    tests
+    middleware
