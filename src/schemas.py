@@ -67,6 +67,31 @@ class Article(ArticleBase):
     tag_list: list[str]
 
 
-class CreateArticleRequest(Article):
+class CompleteArticle(ArticleBase):
+    id: int
     slug: str
+
+
+class IncompleteCreateArticleRequest(Article):
+    slug: str
+
+
+class CreateArticleRequest(IncompleteCreateArticleRequest):
     user_id: int
+
+
+class UpdateArticleRequest(Article):
+    user_id: int
+
+
+class DeleteArticleRequest(BaseModel):
+    user_id: int
+    slug: str
+
+
+class Comment(BaseModel):
+    body: str
+
+
+class FullComment(Comment):
+    id: int

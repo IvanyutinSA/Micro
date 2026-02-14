@@ -39,7 +39,7 @@ def authenticate_user(request: AuthenticationRequest
         raise UnauthorizedError("Invalid credentials")
     if (user.password != hash_password(request.password)):
         raise UnauthorizedError("Invalid credentials")
-    token = create_access_token(request.username)
+    token = create_access_token(request.username, {"user_id": user.id})
     reply = Token(access_token=token,
                   token_type="bearer")
     return reply

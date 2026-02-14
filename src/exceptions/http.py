@@ -63,3 +63,16 @@ class NotFoundError(BaseError):
             detail=detail,
             headers=headers
         )
+
+
+class ForbiddenError(BaseError):
+    def __init__(
+        self,
+        detail: str = "Forbidden",
+        headers: Optional[Dict[str, Any]] = None
+    ) -> None:
+        super().__init__(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=detail,
+            headers=headers
+        )

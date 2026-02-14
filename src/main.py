@@ -2,12 +2,16 @@ import uvicorn
 import threading
 from fastapi import FastAPI
 from src.routes.users_router import router as users_router
+from src.routes.articles_router import router as articles_router
+from src.routes.comments_router import router as comments_router
 from src.exceptions.middleware import ExceptionMiddleware
 
 
 app = FastAPI()
 
 app.include_router(users_router)
+app.include_router(articles_router)
+app.include_router(comments_router)
 app.add_middleware(ExceptionMiddleware)
 
 

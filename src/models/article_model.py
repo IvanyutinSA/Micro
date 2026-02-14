@@ -8,7 +8,8 @@ from src.models.sqlalchemy_models import (Article,
 from src.models.sqlalchemy_db import get_engine
 
 from src.schemas import (CreateArticleRequest,
-                         Article as ArticleSchema)
+                         Article as ArticleSchema,
+                         CompleteArticle)
 
 import inspect
 
@@ -82,11 +83,55 @@ class ArticleModel:
                                      article_id=article_id)
         session.add(ownership)
 
-    def __get_full(self, slug: str, session: Session) -> Article:
+    def get_full(self, slug: str, session: Session) -> Article:
         article: Article = session.scalars(select(Article)
                                            .where(Article.slug == slug)
                                            ).one_or_none()
         return article
+
+    @force_session
+    def get_complete(self, slug: str, session: Session):
+        article = self.get_full(slug, session)
+        tag_list = [tag.tag.tag for tag in article.tag_list]
+        response = CompleteArticle(id=article.id,
+                                   slug=article.slug,
+                                   title=article.title,
+                                   description=article.description,
+                                   body=article.body,
+                                   tag_list=tag_list)
+        return response
+
+    @force_session
+    def get_all(self, session: Session) -> list[ArticleSchema]:
+        articles = session.scalars(select(Article)).all()
+        articles_schema = []
+        for article in articles:
+            tag_list = [tag.tag.tag for tag in article.tag_list]
+            article_schema = ArticleSchema(title=article.title,
+                                           description=article.description,
+                                           body=article.body,
+                                           tag_list=tag_list)
+            articles_schema.append(article_schema)
+        return articles_schema
+
+    @force_session
+    def is_user_own_article_by_slug(self,
+                                    user_id: int,
+                                    slug: str,
+                                    session: Session) -> bool:
+        article = session.scalars(select(Article)
+                                  .where(Article.slug == slug)
+                                  ).one_or_none()
+        if article is None:
+            return False
+        article_id = article.id
+        owns = session.scalars(select(ArticleOwnership)
+                               .where(ArticleOwnership.user_id == user_id)
+                               ).all()
+        for own in owns:
+            if own.article_id == article_id:
+                return True
+        return False
 
     @force_session
     def create(self, request: CreateArticleRequest,
@@ -99,7 +144,7 @@ class ArticleModel:
                           description=request.description,
                           body=request.body)
         self.__create_naked(article, session)
-        article: Article = self.__get_full(slug, session)
+        article: Article = self.get_full(slug, session)
         self.__build_relation_user(user_id, article.id, session)
         for tag_name in tag_list:
             tag = self.tag_model.get_or_create(tag_name, session)
@@ -122,7 +167,7 @@ class ArticleModel:
 
     @force_session
     def update(self, request: ArticleSchema, slug: str, session: Session):
-        article = self.__get_full(slug, session)
+        article = self.get_full(slug, session)
 
         article.title = request.title
         article.description = request.description

@@ -25,5 +25,5 @@ def decode_token(token: str) -> str:
 def verify_token(token: str) -> bool:
     payload = decode_token(token)
     if payload.get("exp", 0) < time():
-        raise False
+        return False
     return True
