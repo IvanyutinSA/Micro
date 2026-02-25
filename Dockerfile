@@ -12,12 +12,15 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # copy everything else
+COPY ./test_utils ./test_utils
+COPY ./tests ./tests
 COPY src ./src
-# COPY .env .env
+COPY .env .env
 
 # prepare to execution
 RUN useradd app
 USER app
 
 # execute
-CMD [ "python", "./src/main.py" ]
+# CMD [ "python", "./src/main.py" ]
+CMD [ "python" , "test_utils/run.py"]

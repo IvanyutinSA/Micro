@@ -27,12 +27,24 @@ services:
       - backend-network
     environment:
       POSTGRES_HOST: postgres-db
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 60s
-      retries: 5
-      start_period: 40s
+    # develop: 
+    #   watch:
+    #     - action: sync
+    #       path: ./src
+    #       target: /usr/local/app/src
+    #       initial_sync: true
+    #     - action: sync
+    #       path: ./tests
+    #       target: /usr/local/app/tests
+    #       initial_sync: true
+    #     - action: rebuild
+    #       path: requirements.txt
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    #   interval: 30s
+    #   timeout: 60s
+    #   retries: 5
+    #   start_period: 40s
     depends_on:
       postgres-db:
         condition: service_healthy
