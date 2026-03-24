@@ -3,6 +3,8 @@ services:
     image: postgres:16
     networks:
       - internal
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -11,6 +13,7 @@ services:
       - users-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      # test: ["CMD", "echo", "3"]
       interval: 30s
       timeout: 60s
       retries: 5
@@ -36,6 +39,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - backend-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 30s
