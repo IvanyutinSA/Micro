@@ -1,4 +1,9 @@
 services:
+  push-notificator:
+    image: ghcr.io/ayusavin/push-notification-playground:1.0.0
+    ports:
+      - "8000:8000"
+
   users-db:
     image: postgres:16
     networks:

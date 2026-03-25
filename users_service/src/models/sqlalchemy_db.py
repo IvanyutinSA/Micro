@@ -16,7 +16,6 @@ database_url = "postgresql://{}:{}@{}:{}/{}".format(
         POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST,
         POSTGRES_PORT, POSTGRES_DB)
 engine = create_engine(database_url, echo=False)
-Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)
 
 
