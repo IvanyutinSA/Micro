@@ -20,5 +20,4 @@ RUN useradd app
 USER app
 
 # execute
-# CMD [ "python", "./src/main.py" ]
-CMD [ "python" , "test_utils/run.py"]
+CMD ["celery", "-A", "src.tasks",  "worker"]

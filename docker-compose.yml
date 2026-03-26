@@ -1,8 +1,36 @@
 services:
+  worker:
+    build: ./worker
+    environment:
+      ARTICLE_DB_HOST: backend-db
+      USER_DB_HOST: users-db
+      PUSH_URL: "http://push-notificator:8000/api/v1/notify"
+# PUSH_URL=http://localhost:8000/api/v1/notify
+      REDIS_URL: "redis://redis:6379/0"
+    networks:
+      - internal
+    depends_on:
+      redis:
+        condition: service_healthy
+
   push-notificator:
     image: ghcr.io/ayusavin/push-notification-playground:1.0.0
+    networks:
+      - internal
     ports:
       - "8000:8000"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   users-db:
     image: postgres:16
@@ -18,7 +46,6 @@ services:
       - users-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
-      # test: ["CMD", "echo", "3"]
       interval: 30s
       timeout: 60s
       retries: 5
@@ -64,14 +91,24 @@ services:
     depends_on:
       backend-db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   api-gateway:
     image: nginx:latest
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - backend
-      - users-service
+      users-service:
+        condition: service_started
+      backend:
+        condition: service_healthy
     ports:
       - "80:80"
       - "443:443"

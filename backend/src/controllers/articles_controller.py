@@ -1,6 +1,12 @@
+import os
+import redis
+
 from src.exceptions.http import (NotFoundError,
                                  ForbiddenError,
                                  ConflictError)
+
+from celery import Celery
+from dotenv import load_dotenv
 
 from src.schemas import (CreateArticleRequest,
                          Article,
@@ -8,6 +14,9 @@ from src.schemas import (CreateArticleRequest,
                          DeleteArticleRequest)
 
 from src.models.article_model import ArticleModel
+
+load_dotenv()
+celery = Celery("worker", broker=os.getenv("REDIS_URL"))
 
 
 class ArticleController:
@@ -18,6 +27,9 @@ class ArticleController:
         if self.article_model.get(request.slug) is not None:
             raise ConflictError("Try another slug")
         self.article_model.create(request)
+        author_id = request.user_id
+        article_id = self.article_model.get_one_field(request.slug, "id")
+        celery.send_task("notify_followers", args=[author_id, article_id])
 
     def get_articles(self) -> list[Article]:
         return self.article_model.get_all()

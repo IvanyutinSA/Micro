@@ -1,3 +1,4 @@
+from typing import Any
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
@@ -88,6 +89,14 @@ class ArticleModel:
                                            .where(Article.slug == slug)
                                            ).one_or_none()
         return article
+
+    @force_session
+    def get_one_field(self, slug: str, field_name: str, session: Session
+                      ) -> Any:
+        user = session.scalars(select(Article)
+                               .where(Article.slug == slug)).one()
+        assert hasattr(user, field_name), "deserved for bad design"
+        return getattr(user, field_name)
 
     @force_session
     def get_complete(self, slug: str, session: Session):

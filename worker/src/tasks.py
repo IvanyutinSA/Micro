@@ -19,11 +19,6 @@ celery = Celery("worker", broker=os.getenv("REDIS_URL"))
 completed = set()
 
 
-@celery.task(bind=True, max_retries=1, name="get_subkey")
-def get_subkey(self, user_id: int):
-    print(user_model.get_subkey(user_id))
-
-
 @celery.task(bind=True, max_retries=5, name="notify_followers")
 def notify_followers(self, author_id: int, article_id: int):
     try:
