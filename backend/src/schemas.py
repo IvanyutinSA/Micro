@@ -45,3 +45,7 @@ class Comment(BaseModel):
 
 class FullComment(Comment):
     id: int
+
+
+class Preview(BaseModel):
+    preview_url: str

@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 from src.schemas import (CreateArticleRequest,
                          Article,
                          UpdateArticleRequest,
-                         DeleteArticleRequest)
+                         DeleteArticleRequest,
+                         Preview)
 
 from src.models.article_model import ArticleModel
 
@@ -68,5 +69,11 @@ class ArticleController:
     def reject(self, article_id: int):
         self.article_model.set_one_field(article_id, "status", "REJECTED")
 
-    def set_status(self, article_id: int, status: str):
-        self.article_model.set_one_field(article_id, "status", status)
+    def error(self, article_id: int):
+        self.article_model.set_one_field(article_id, "status", "ERROR")
+
+    def put_publish(self, article_id: int):
+        self.article_model.set_one_field(article_id, "status", "PUBLISHED")
+
+    def preview(self, article_id: int, preview: Preview):
+        preview_url = preview.preview_url

@@ -3,7 +3,8 @@ from fastapi import APIRouter, Depends
 
 from src.schemas import (Article, CreateArticleRequest,
                          IncompleteCreateArticleRequest,
-                         UpdateArticleRequest, DeleteArticleRequest)
+                         UpdateArticleRequest, DeleteArticleRequest,
+                         Preview)
 from src.routes.extra import get_current_user_id
 from src.controllers.articles_controller import ArticleController
 
@@ -71,5 +72,10 @@ def error(id: int):
 
 
 @router.put("/{id}/preview")
-def preview(id: int, preview):
+def preview(id: int, preview: Preview):
     controller.preview(id, preview)
+
+
+@router.put("/{id}/publish")
+def put_publish(id: int):
+    controller.put_publish(id)
