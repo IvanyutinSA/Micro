@@ -5,7 +5,7 @@ services:
       ARTICLE_DB_HOST: backend-db
       USER_DB_HOST: users-db
       PUSH_URL: "http://push-notificator:8000/api/v1/notify"
-# PUSH_URL=http://localhost:8000/api/v1/notify
+      ARTICLE_SERVICE_URL: "http://backend:8000"
       REDIS_URL: "redis://redis:6379/0"
     networks:
       - internal

@@ -1,4 +1,4 @@
-from extra import generate_headers
+from src.extra import generate_headers
 import random
 from celery import Celery
 import requests
@@ -66,7 +66,7 @@ def post_moderate(self, post_id: int, author_id: int,
     try:
         approved = random.choice([True, False])
         if not approved:
-            logging.info("Article: {post_id} rejected")
+            logging.warning(f"Article: {post_id} rejected")
             headers = generate_headers(API_KEY)
             url = f"{ARTICLE_SERVICE_URL}/articles/{post_id}/reject"
             response = requests.post(url,
@@ -74,7 +74,7 @@ def post_moderate(self, post_id: int, author_id: int,
                                      headers=headers)
             response.raise_for_status()
             return
-        logging.info(f"Article: {post_id} approved")
+        logging.warning(f"Article: {post_id} approved")
         args = [post_id, title, body, author_id]
         celery.send_task("post.generate_preview", args)
     except Exception as e:
@@ -94,7 +94,7 @@ def generate_preview(self, article_id: int, title: str, body: str,
         response = requests.put(url, json=json, headers=headers)
         response.raise_for_status()
 
-        logging.info(f"Preview generated for {article_id}")
+        logging.warning(f"Preview generated for {article_id}")
         celery.send_task("post.publish", [author_id, article_id])
     except Exception as e:
         to_dlq(self, article_id)
@@ -110,7 +110,7 @@ def post_publish(self, author_id: int, article_id: int):
         response = requests.put(url, headers=headers)
         response.raise_for_status()
 
-        logging.log(f"Article {article_id} published")
+        logging.warning(f"Article {article_id} published")
         celery.send_task("notify_followers", [author_id, article_id])
     except Exception as e:
         to_dlq(self, article_id)
