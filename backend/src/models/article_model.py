@@ -148,10 +148,12 @@ class ArticleModel:
         user_id = request.user_id
         slug = request.slug
         tag_list = request.tag_list
+        status = "DRAFT"
         article = Article(slug=slug,
                           title=request.title,
                           description=request.description,
-                          body=request.body)
+                          body=request.body,
+                          status=status)
         self.__create_naked(article, session)
         article: Article = self.get_full(slug, session)
         self.__build_relation_user(user_id, article.id, session)

@@ -15,6 +15,7 @@ class Article(Base):
     title: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=False)
     body: Mapped[str] = mapped_column(nullable=False)
+    status: Mapped[str] = mapped_column(nullable=False)
 
     author: Mapped["ArticleOwnership"] = relationship(
             back_populates="article")
