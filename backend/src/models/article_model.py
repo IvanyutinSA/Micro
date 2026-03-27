@@ -99,6 +99,23 @@ class ArticleModel:
         return getattr(user, field_name)
 
     @force_session
+    def get_one_field_by_id(self, id: int, field_name: str, session: Session
+                            ) -> Any:
+        user = session.scalars(select(Article)
+                               .where(Article.id == id)).one()
+        assert hasattr(user, field_name), "deserved for bad design"
+        return getattr(user, field_name)
+
+    @force_session
+    def set_one_field(self, id: int, field_name: str,
+                      field_value: Any, session: Session
+                      ) -> Any:
+        user = session.scalars(select(Article)
+                               .where(Article.id == id)).one()
+        assert hasattr(user, field_name), "deserved for bad design"
+        return setattr(user, field_name, field_value)
+
+    @force_session
     def get_complete(self, slug: str, session: Session):
         article = self.get_full(slug, session)
         tag_list = [tag.tag.tag for tag in article.tag_list]

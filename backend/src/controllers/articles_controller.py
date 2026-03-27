@@ -53,3 +53,20 @@ class ArticleController:
             raise ForbiddenError()
         if not self.article_model.delete(slug):
             raise NotFoundError()
+
+    def publish(self, article_id: int, author_id: int):
+        # check if its indeed author
+        slug = self.article_model.get_one_field_by_id(article_id, "slug")
+        if not self.article_model.is_user_own_article_by_slug(author_id,
+                                                              slug):
+            raise ForbiddenError()
+        # set status to pending
+        status = "PENDING_STATUS"
+        self.article_model.set_one_field(article_id, "status", status)
+        title = self.article_model.get_one_field_by_id(article_id, "title")
+        body = self.article_model.get_one_field_by_id(article_id, "body")
+        args = [article_id, author_id, title, body, author_id]
+        celery.send_task("post.moderate", args)
+
+    def reject(self, article_id: int):
+        self.article_model.set_one_field(article_id, "status", "REJECTED")

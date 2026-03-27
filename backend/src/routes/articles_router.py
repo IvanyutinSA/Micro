@@ -51,3 +51,15 @@ def delete_article(slug: str,
     request = DeleteArticleRequest(slug=slug,
                                    user_id=user_id)
     controller.delete_article(request)
+
+
+@router.post("/{id}/publish")
+def publish(id: int,
+            user_id: Annotated[int,
+                               Depends(get_current_user_id)]):
+    controller.publish(id, user_id)
+
+
+@router.post("/{id}/reject")
+def reject(id: int):
+    controller.reject(id)
