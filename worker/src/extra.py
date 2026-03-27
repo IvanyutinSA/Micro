@@ -1,6 +1,10 @@
 import inspect
 
 
+def generate_headers(api_key: str):
+    return {"Authorization": f"Token {api_key}"}
+
+
 class CMD:
     def __init__(self):
         self.content = ""

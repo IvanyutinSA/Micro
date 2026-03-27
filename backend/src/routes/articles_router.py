@@ -65,6 +65,11 @@ def reject(id: int):
     controller.reject(id)
 
 
-@router.post("/{id}/{status}")
-def preview(id: int, status: str):
-    controller.set_status(id, status)
+@router.post("/{id}/error")
+def error(id: int):
+    controller.error(id)
+
+
+@router.put("/{id}/preview")
+def preview(id: int, preview):
+    controller.preview(id, preview)
