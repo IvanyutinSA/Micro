@@ -63,3 +63,8 @@ def publish(id: int,
 @router.post("/{id}/reject")
 def reject(id: int):
     controller.reject(id)
+
+
+@router.post("/{id}/{status}")
+def preview(id: int, status: str):
+    controller.set_status(id, status)

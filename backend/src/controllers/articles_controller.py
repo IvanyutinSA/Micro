@@ -27,9 +27,6 @@ class ArticleController:
         if self.article_model.get(request.slug) is not None:
             raise ConflictError("Try another slug")
         self.article_model.create(request)
-        author_id = request.user_id
-        article_id = self.article_model.get_one_field(request.slug, "id")
-        celery.send_task("notify_followers", args=[author_id, article_id])
 
     def get_articles(self) -> list[Article]:
         return self.article_model.get_all()
@@ -70,3 +67,6 @@ class ArticleController:
 
     def reject(self, article_id: int):
         self.article_model.set_one_field(article_id, "status", "REJECTED")
+
+    def set_status(self, article_id: int, status: str):
+        self.article_model.set_one_field(article_id, "status", status)
