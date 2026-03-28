@@ -1,16 +1,79 @@
 services:
-  postgres-db:
-    image: postgres:16
-    ports:
-      - "8002:5432"
+  worker:
+    build: ./worker
+    environment:
+      ARTICLE_DB_HOST: backend-db
+      USER_DB_HOST: users-db
+      PUSH_URL: "http://push-notificator:8000/api/v1/notify"
+      ARTICLE_SERVICE_URL: "http://backend:8000"
+      REDIS_URL: "redis://redis:6379/0"
     networks:
-      - backend-network
+      - internal
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  push-notificator:
+    image: ghcr.io/ayusavin/push-notification-playground:1.0.0
+    networks:
+      - internal
+    ports:
+      - "8000:8000"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  users-db:
+    image: postgres:16
+    networks:
+      - internal
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - users-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  users-service:
+    build: ./users_service
+    networks:
+      - internal
+    environment:
+      POSTGRES_HOST: users-db
+    depends_on:
+      users-db:
+        condition: service_healthy
+
+  backend-db:
+    image: postgres:16
+    networks:
+      - internal
+    environment:
+      WORKER_API_KEY: ${WORKER_API_KEY}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - backend-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 30s
@@ -19,39 +82,45 @@ services:
       start_period: 80s
 
   backend:
-    build:
-      context: .
+    build: ./backend
     ports:
       - "8001:8000"
     networks:
-      - backend-network
+      - internal
     environment:
-      POSTGRES_HOST: postgres-db
-    # develop: 
-    #   watch:
-    #     - action: sync
-    #       path: ./src
-    #       target: /usr/local/app/src
-    #       initial_sync: true
-    #     - action: sync
-    #       path: ./tests
-    #       target: /usr/local/app/tests
-    #       initial_sync: true
-    #     - action: rebuild
-    #       path: requirements.txt
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-    #   interval: 30s
-    #   timeout: 60s
-    #   retries: 5
-    #   start_period: 40s
+      POSTGRES_HOST: backend-db
     depends_on:
-      postgres-db:
+      backend-db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  api-gateway:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      users-service:
+        condition: service_started
+      backend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - internal
+
 
 volumes:
-  pgdata:
+  users-db-data:
+  backend-db-data:
 
 networks:
-  backend-network:
+  internal:
     driver: bridge

@@ -16,6 +16,7 @@ COPY ./test_utils ./test_utils
 COPY ./tests ./tests
 COPY src ./src
 COPY .env .env
+COPY api-keys api-keys
 
 # prepare to execution
 RUN useradd app

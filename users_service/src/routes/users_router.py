@@ -1,12 +1,15 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
-from src.routes.extra import get_current_user_req
+from src.routes.extra import get_current_user_req, get_current_user_id
 from src.controllers.users_controller import (
         register_user,
         authenticate_user,
         get_user,
         update_user,
+        subscribe,
+        get_subscription_key,
+        set_subscription_key as uc_set_subscription_key
 )
 
 from src.schemas import (
@@ -18,10 +21,12 @@ from src.schemas import (
         UpdateUserRequest,
         UpdateUserReply,
         Token,
+        SubscriptionKey,
+        SubscribeRequest,
 )
 
 
-router = APIRouter(prefix="/users")
+router = APIRouter()
 
 
 @router.post("/")
@@ -56,5 +61,16 @@ def update_current_user(request: UpdateCurrentUserRequest,
 
 
 @router.put("/me/subscription-key")
-def set_subscription_key(request: SubscriptionKey):
-    pass
+def set_subscription_key(request: SubscriptionKey,
+                         user_id: Annotated[int,
+                                            Depends(get_current_user_id)]
+                         ):
+    uc_set_subscription_key(request, user_id)
+
+
+@router.put("/subscribe")
+def subscribe_user(request: SubscribeRequest,
+                   user_id: Annotated[int,
+                                      Depends(get_current_user_id)]
+                   ):
+    subscribe(user_id, request)
