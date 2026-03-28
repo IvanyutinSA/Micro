@@ -5,7 +5,7 @@ from src.schemas import (Article, CreateArticleRequest,
                          IncompleteCreateArticleRequest,
                          UpdateArticleRequest, DeleteArticleRequest,
                          Preview)
-from src.routes.extra import get_current_user_id
+from src.routes.extra import get_current_user_id, defend_api
 from src.controllers.articles_controller import ArticleController
 
 
@@ -62,20 +62,21 @@ def publish(id: int,
 
 
 @router.post("/{id}/reject")
-def reject(id: int):
+def reject(id: int, _: Annotated[bool, Depends(defend_api)]):
     controller.reject(id)
 
 
 @router.post("/{id}/error")
-def error(id: int):
+def error(id: int, _: Annotated[bool, Depends(defend_api)]):
     controller.error(id)
 
 
 @router.put("/{id}/preview")
-def preview(id: int, preview: Preview):
+def preview(id: int, preview: Preview, _: Annotated[bool,
+                                                    Depends(defend_api)]):
     controller.preview(id, preview)
 
 
 @router.put("/{id}/publish")
-def put_publish(id: int):
+def put_publish(id: int, _: Annotated[bool, Depends(defend_api)]):
     controller.put_publish(id)
